@@ -217,27 +217,32 @@ djiabsquotes = load_quotes_absolute_prices(DJIA, start=datetime(2013, 1, 1))
 djianewsentiment = load_quandl_newsentiment(DJIA)
 
 #########CLASIFICATION
-for index, row in DJIA.iterrows():
-    stock_cache_file = row['NSCode']+'-cache.csv'
-    if os.path.exists(stock_cache_file):
-        print ('Loading features from cache ', row['NSCode'])
-        get_feature_data(stock_cache_file) # calling gen_data method to add features
-        print ("\nThe stock open trend for NBD is:")
-        predicted_trend = predict_trend(datenews, news, len(datenews)+1)  
-        print ("RBF kernel: $", str(predicted_trend))
-
-get_feature_data('NS1/CSCO_US-cache.csv') # calling gen_data method to add features
+print ("CISCO SVC test")
+get_feature_data('NS1/CSCO_US-cache.csv') 
 i=0
 print ("Dates    Sentiment")
 while i < len(datenews):
     print (datenews[i],"    ", news[i])
     i=i+1
-print ("\nThe stock open trend for NBD is:")
+print ("\nThe stock sentiment trend for NBD is:")
 predicted_trend = predict_trend(datenews, news, len(datenews)+1)  
-print ("RBF kernel: $", str(predicted_trend))
+print ("RBF kernel:", str(predicted_trend))
+
+for index, row in DJIA.iterrows():
+    stock_cache_file = row['NSCode']+'-cache.csv'
+    datenews=[]
+    news=[]
+    if os.path.exists(stock_cache_file):
+        print ('Loading features from cache ', row['NSCode'])
+        get_feature_data(stock_cache_file) 
+        print ("\nThe stock sentiment trend for NBD is:")
+        predicted_trend = predict_trend(datenews, news, len(datenews)+1)  
+        print ("RBF kernel:", str(predicted_trend))
 
 
 ###########REGRESSION
+dates=[]
+prices=[]
 get_price_data('quotes/CSCO-absolute-prices-cache.csv') # calling get_data method by passing the csv file to it
 print ("Dates    Prices ")
 i=0
@@ -245,7 +250,7 @@ while i < len(dates):
     print (dates[i],"    ", prices[i])
     i=i+1
 print ("\nThe stock open price for NBD is:")
-predicted_price = predict_price(dates, prices, 28)  
+predicted_price = predict_price(dates, prices, len(dates)+1)  
 print ("RBF kernel: $", str(predicted_price[0]))
 print ("Linear kernel: $", str(predicted_price[1]))
 print ("Polynomial kernel: $", str(predicted_price[2]))
