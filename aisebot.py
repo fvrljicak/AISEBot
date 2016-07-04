@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import quandl
+import math
 from datetime import datetime
 
 pd.set_option('display.max_rows', None)
@@ -288,14 +289,22 @@ ntrain=1
 ntest=1
 print ("\nThe stock sentiment trend and prices for CSCO NBD is:")
 testrange=30
-while testrange > 1:    
+i=testrange+1
+positive_result=0
+accuracygap=0
+while i > 1:    
     #########CLASIFICATION
-    predicted_trend_ns = predict_trend_ns(dfnews_prices, listtrends, testrange, testrange-1)  
-    print ("RBF kernel trend for ", dfnews_prices.tail(testrange-1).index[0], ": ", str(predicted_trend_ns))
-    print ("Comparable Real trend", dfnews_prices.tail(testrange-1).index[0], ": ", dfnews_prices.tail(testrange-1).values[0][3])
+    predicted_trend_ns = predict_trend_ns(dfnews_prices, listtrends, i, i-1)  
+    print ("RBF kernel trend for ", dfnews_prices.tail(i-1).index[0], ": ", str(predicted_trend_ns))
+    print ("Comparable Real trend", dfnews_prices.tail(i-1).index[0], ": ", dfnews_prices.tail(i-1).values[0][3])
+    if predicted_trend_ns==dfnews_prices.tail(i-1).values[0][3]:
+        positive_result=positive_result+1
     ###########REGRESSION
-    predicted_price_ns = predict_price_ns(dfnews_prices, listprices, testrange, testrange-1)  
-    print ("RBF kernel price for ", dfnews_prices.tail(testrange-1).index[0], ": ", str(predicted_price_ns))
-    print ("Comparable Real price", dfnews_prices.tail(testrange-1).index[0], ": ", dfnews_prices.tail(testrange-1).values[0][1])
-    testrange=testrange-1
-    
+    predicted_price_ns = predict_price_ns(dfnews_prices, listprices, i, i-1)  
+    print ("RBF kernel price for ", dfnews_prices.tail(i-1).index[0], ": ", str(predicted_price_ns))
+    print ("Comparable Real price", dfnews_prices.tail(i-1).index[0], ": ", dfnews_prices.tail(i-1).values[0][1])
+    accuracygap=math.fabs(predicted_price_ns-dfnews_prices.tail(i-1).values[0][1])+accuracygap
+    i=i-1
+testresult=positive_result/testrange
+print ("Positive trend prediction rate: ", testresult*100,"%")    
+print ("Price prediction AVRG accuracy: ", accuracygap/testrange)    
